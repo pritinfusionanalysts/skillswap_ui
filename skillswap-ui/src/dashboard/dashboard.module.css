@@ -1,0 +1,63 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+  background: #111; /* Match your auth background */
+  color: #fff;
+}
+
+.sidebar {
+  width: 250px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 30px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 50px;
+}
+
+.logo span { color: #d4af7a; }
+
+.userGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.userCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  transition: transform 0.3s ease;
+}
+
+.userCard:hover {
+  transform: translateY(-5px);
+  border-color: #d4af7a;
+}
+
+.skills span {
+  display: inline-block;
+  background: rgba(212, 175, 122, 0.1);
+  color: #d4af7a;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  margin: 5px 5px 0 0;
+}
+
+.connectBtn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 10px;
+  background: #d4af7a;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}

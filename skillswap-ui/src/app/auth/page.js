@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import styles from "./auth.module.css";
+import Link from 'next/link';
 
 export default function AuthPage() {
   const [isSignup, setIsSignup] = useState(false);
@@ -104,7 +105,7 @@ export default function AuthPage() {
             <span>Password</span>
             <input name="password" type="password" required onChange={handleChange} />
           </label>
-          <p className={styles.forgotPass}>Forgot password?</p>
+          <Link href="/forgot-password" className={styles.forgotPass}>Forgot password?</Link>
           
           <button type="submit" className={styles.submit} disabled={loading}>
             {loading ? "Signing In..." : "Sign In"}
