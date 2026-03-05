@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./auth.module.css";
 import Link from 'next/link';
 
 export default function AuthPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [isSignup, setIsSignup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -15,14 +19,25 @@ export default function AuthPage() {
     password: "",
   });
 
+  // --- NEW: Handle Google OAuth Redirect & Existing Sessions ---
+  useEffect(() => {
+    const token = searchParams.get("token");
+    const username = searchParams.get("username");
+
+    if (token) {
+      localStorage.setItem("token", token);
+      if (username) localStorage.setItem("username", username);
+      router.push("/dashboard"); // Redirect to your main app
+    }
+  }, [searchParams, router]);
+
   const handleChange = (e) => {
     setError("");
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Google Login Handler
   const handleGoogleLogin = () => {
-    // Redirects the entire window to your backend OAuth2 entry point
+    // Note: Your Spring Boot app should redirect back to this page with ?token=...
     window.location.href = "http://localhost:8082/oauth2/authorization/google";
   };
 
@@ -35,6 +50,8 @@ export default function AuthPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
+    
     try {
       const response = await fetch("http://localhost:8082/api/user/login", {
         method: "POST",
@@ -46,14 +63,19 @@ export default function AuthPage() {
       });
 
       const data = await response.json();
+      
       if (response.ok) {
+        // STORE DATA
         localStorage.setItem("token", data.jwt);
-        alert(`Welcome back, ${data.username}!`);
+        localStorage.setItem("username", data.username);
+        
+        // REDIRECT
+        router.push("/dashboard"); 
       } else {
-        setError("Invalid username or password.");
+        setError(data.message || "Invalid username or password.");
       }
     } catch (err) {
-      setError("Server connection failed.");
+      setError("Server connection failed. Is the backend running?");
     } finally {
       setLoading(false);
     }
@@ -68,6 +90,8 @@ export default function AuthPage() {
     }
 
     setLoading(true);
+    setError("");
+
     try {
       const response = await fetch("http://localhost:8082/api/user/signup", {
         method: "POST",
@@ -76,10 +100,11 @@ export default function AuthPage() {
       });
 
       if (response.ok) {
-        alert("Account created successfully!");
-        setIsSignup(false);
+        alert("Account created successfully! Please sign in.");
+        setIsSignup(false); // Move to login view
       } else {
-        setError("User already exists.");
+        const data = await response.json();
+        setError(data.message || "User already exists.");
       }
     } catch (err) {
       setError("Server connection failed.");
@@ -95,7 +120,7 @@ export default function AuthPage() {
       <div className={`${styles.form} ${styles.signIn}`}>
         <form onSubmit={handleLogin}>
           <h2>Welcome</h2>
-          {error && !isSignup && <p style={{color: 'red', fontSize: '12px'}}>{error}</p>}
+          {error && !isSignup && <p style={{color: '#ff4b2b', fontSize: '12px', marginBottom: '10px'}}>{error}</p>}
           
           <label>
             <span>Username</span>
@@ -108,10 +133,9 @@ export default function AuthPage() {
           <Link href="/forgot-password" className={styles.forgotPass}>Forgot password?</Link>
           
           <button type="submit" className={styles.submit} disabled={loading}>
-            {loading ? "Signing In..." : "Sign In"}
+            {loading ? "Processing..." : "Sign In"}
           </button>
 
-          {/* Google Button */}
           <button type="button" onClick={handleGoogleLogin} className={styles.googleBtn}>
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="google" />
             Continue with Google
@@ -137,7 +161,7 @@ export default function AuthPage() {
         <div className={`${styles.form} ${styles.signUp}`}>
           <form onSubmit={handleSignup}>
             <h2>Create Account</h2>
-            {error && isSignup && <p style={{color: 'red', fontSize: '12px'}}>{error}</p>}
+            {error && isSignup && <p style={{color: '#ff4b2b', fontSize: '12px', marginBottom: '10px'}}>{error}</p>}
             
             <label>
               <span>Username</span>
@@ -156,7 +180,6 @@ export default function AuthPage() {
               {loading ? "Creating..." : "Sign Up"}
             </button>
 
-            {/* Google Button */}
             <button type="button" onClick={handleGoogleLogin} className={styles.googleBtn}>
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="google" />
               Sign up with Google

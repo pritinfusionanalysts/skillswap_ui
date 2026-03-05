@@ -1,0 +1,116 @@
+.container {
+  display: flex;
+  height: calc(100vh - 40px); /* Adjust based on your top padding */
+  background: #f9fafb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.contactList {
+  width: 350px;
+  background: white;
+  border-right: 1px solid #eee;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.title { margin-bottom: 20px; color: #111; }
+
+.contactCard {
+  display: flex;
+  padding: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-bottom: 10px;
+}
+
+.contactCard:hover { background: #f0f4ff; }
+.active { background: #edf2ff; border-left: 4px solid #4f46e5; }
+
+.avatar {
+  width: 45px;
+  height: 45px;
+  background: #4f46e5;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  position: relative;
+  margin-right: 12px;
+}
+
+.onlineBadge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: #22c55e;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.contactInfo { flex: 1; overflow: hidden; }
+.contactHeader { display: flex; justify-content: space-between; align-items: center; }
+.time { font-size: 0.75rem; color: #888; }
+.skillTag { font-size: 0.8rem; color: #4f46e5; font-weight: 500; margin: 2px 0; }
+.lastMsg { font-size: 0.85rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.chatWindow {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.chatHeader {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.messagesArea {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: #fcfcfc;
+}
+
+.messageReceived, .messageSent {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 15px;
+  font-size: 0.95rem;
+}
+
+.messageReceived { background: #eee; align-self: flex-start; }
+.messageSent { background: #4f46e5; color: white; align-self: flex-end; }
+
+.inputArea {
+  padding: 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+}
+
+.input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+}
+
+.sendBtn {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 0 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
