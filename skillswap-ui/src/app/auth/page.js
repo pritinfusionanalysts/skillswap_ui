@@ -12,24 +12,66 @@ export default function AuthPage() {
   const [isSignup, setIsSignup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+  
+  // Form data state
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
   });
 
-  // --- NEW: Handle Google OAuth Redirect & Existing Sessions ---
+  // User profile data from backend
+  const [userProfile, setUserProfile] = useState(null);
+
+  const modeOptions = [
+    { value: "ONLINE", label: "Online" },
+    { value: "OFFLINE", label: "Offline" },
+    { value: "HYBRID", label: "Hybrid" }
+  ];
+
+  // Handle OAuth redirect & check existing session
   useEffect(() => {
     const token = searchParams.get("token");
     const username = searchParams.get("username");
 
+    // OAuth success redirect
     if (token) {
       localStorage.setItem("token", token);
       if (username) localStorage.setItem("username", username);
-      router.push("/dashboard"); // Redirect to your main app
+      router.push("/dashboard");
+      return;
     }
+
+    // Check existing session
+    checkUserSession();
   }, [searchParams, router]);
+
+  // Fetch user profile if token exists
+  const checkUserSession = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const response = await fetch("http://localhost:8082/api/user/profile", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserProfile(data);
+          // Auto-redirect if already logged in
+          router.push("/dashboard");
+        } else if (response.status === 401) {
+          localStorage.removeItem("token");
+        }
+      } catch (err) {
+        console.error("Session check failed:", err);
+      }
+    }
+  };
 
   const handleChange = (e) => {
     setError("");
@@ -37,7 +79,6 @@ export default function AuthPage() {
   };
 
   const handleGoogleLogin = () => {
-    // Note: Your Spring Boot app should redirect back to this page with ?token=...
     window.location.href = "http://localhost:8082/oauth2/authorization/google";
   };
 
@@ -47,39 +88,49 @@ export default function AuthPage() {
     return null;
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    
-    try {
-      const response = await fetch("http://localhost:8082/api/user/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password,
-        }),
-      });
+ const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError("");
+  
+  try {
+    const response = await fetch("http://localhost:8082/api/user/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: formData.username,
+        password: formData.password,
+      }),
+    });
 
+    // 1. Check if the response is actually okay
+    if (response.ok) {
       const data = await response.json();
-      
-      if (response.ok) {
-        // STORE DATA
-        localStorage.setItem("token", data.jwt);
-        localStorage.setItem("username", data.username);
-        
-        // REDIRECT
-        router.push("/dashboard"); 
-      } else {
-        setError(data.message || "Invalid username or password.");
+      localStorage.setItem("token", data.jwt);
+      localStorage.setItem("username", data.username);
+      router.push("/explore"); 
+    } 
+    // 2. If it's 401 (or any other error), handle it without crashing
+    else {
+      let errorMessage = "Invalid username or password.";
+      try {
+        // Try to get the error message from the body if it exists
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (jsonErr) {
+        // If it's not JSON (e.g., plain text 401), just use the default message
+        console.log("Response was not JSON, using default error message.");
       }
-    } catch (err) {
-      setError("Server connection failed. Is the backend running?");
-    } finally {
-      setLoading(false);
+      setError(errorMessage);
     }
-  };
+  } catch (err) {
+    // This will now only run if the network is DOWN or there's a CORS error
+    setError("Server connection failed. Is the backend running?");
+    console.error("Connection Error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -101,7 +152,7 @@ export default function AuthPage() {
 
       if (response.ok) {
         alert("Account created successfully! Please sign in.");
-        setIsSignup(false); // Move to login view
+        setIsSignup(false);
       } else {
         const data = await response.json();
         setError(data.message || "User already exists.");
@@ -112,6 +163,33 @@ export default function AuthPage() {
       setLoading(false);
     }
   };
+
+  // Show profile preview if user data loaded
+  if (userProfile) {
+    return (
+      <div className={styles.cont}>
+        <div className={styles.profilePreview}>
+          <h2>Welcome back, {userProfile.username}!</h2>
+          <div className={styles.profileInfo}>
+          <img 
+              src={`http://localhost:8082${userData.image}`}  // Full backend URL
+              className={styles.avatar} 
+              alt="Profile"
+              onError={(e) => {
+               e.currentTarget.src = "https://i.imgur.com/8Km9mS8.png";
+              }}
+          />
+            <p><strong>Email:</strong> {userProfile.email}</p>
+            <p><strong>Location:</strong> {userProfile.location || 'Not set'}</p>
+            <p><strong>Mode:</strong> {userProfile.preferredMode || 'ONLINE'}</p>
+          </div>
+          <button onClick={() => router.push("/dashboard")} className={styles.submit}>
+            Go to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`${styles.cont} ${isSignup ? styles.sSignup : ""}`}>
@@ -124,11 +202,23 @@ export default function AuthPage() {
           
           <label>
             <span>Username</span>
-            <input name="username" type="text" required onChange={handleChange} />
+            <input 
+              name="username" 
+              type="text" 
+              required 
+              onChange={handleChange}
+              value={formData.username}
+            />
           </label>
           <label>
             <span>Password</span>
-            <input name="password" type="password" required onChange={handleChange} />
+            <input 
+              name="password" 
+              type="password" 
+              required 
+              onChange={handleChange}
+              value={formData.password}
+            />
           </label>
           <Link href="/forgot-password" className={styles.forgotPass}>Forgot password?</Link>
           
@@ -165,15 +255,33 @@ export default function AuthPage() {
             
             <label>
               <span>Username</span>
-              <input name="username" type="text" required onChange={handleChange} />
+              <input 
+                name="username" 
+                type="text" 
+                required 
+                onChange={handleChange}
+                value={formData.username}
+              />
             </label>
             <label>
               <span>Email</span>
-              <input name="email" type="email" required onChange={handleChange} />
+              <input 
+                name="email" 
+                type="email" 
+                required 
+                onChange={handleChange}
+                value={formData.email}
+              />
             </label>
             <label>
               <span>Password</span>
-              <input name="password" type="password" required onChange={handleChange} />
+              <input 
+                name="password" 
+                type="password" 
+                required 
+                onChange={handleChange}
+                value={formData.password}
+              />
             </label>
             
             <button type="submit" className={styles.submit} disabled={loading}>

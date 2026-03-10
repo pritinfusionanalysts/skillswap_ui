@@ -36,3 +36,38 @@
 .active {
   color: #4e89f8; /* Replace with your specific Login Page blue */
 }       
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Pushes the logout container to the bottom */
+  height: 100vh;
+  padding: 20px 0;
+  /* ... existing styles ... */
+}
+
+.iconContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.logoutContainer {
+  margin-top: auto; /* Fallback for older browsers */
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.logoutBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666; /* Match your other icons */
+  transition: color 0.3s ease;
+  padding: 10px;
+}
+
+.logoutBtn:hover {
+  color: #ff4d4d; /* Changes to red on hover to signal logout */
+}
