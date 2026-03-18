@@ -51,13 +51,13 @@ export default function AuthPage() {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const response = await fetch("http://localhost:8082/api/user/profile", {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-        });
+        // const response = await fetch("http://localhost:8082/api/user/profile", {
+          // method: "GET",
+          // headers: {
+            // "Authorization": `Bearer ${token}`,
+            // "Content-Type": "application/json"
+          // },
+        // });
 
         if (response.ok) {
           const data = await response.json();

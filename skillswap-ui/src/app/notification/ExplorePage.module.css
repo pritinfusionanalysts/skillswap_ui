@@ -1,0 +1,112 @@
+.container { display: flex; background: #f3f4f6; min-height: 100vh; }
+.mainContent { flex: 1; padding: 40px; }
+.header { margin-bottom: 30px; }
+.header h1 { font-size: 26px; color: #111827; margin: 0; }
+.header p { color: #6b7280; font-size: 14px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.acceptedCard {
+  border-left: 5px solid #10b981; /* Green highlight for accepted */
+}
+
+.cardInfo { display: flex; gap: 16px; align-items: center; margin-bottom: 24px; }
+
+.avatarContainer { position: relative; }
+.avatar { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; }
+.activeBadge { 
+    position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; 
+    background: #10b981; border: 3px solid white; border-radius: 50%; 
+}
+
+.userDetails h3 { font-size: 18px; margin: 0; color: #111827; }
+.userDetails p { font-size: 14px; color: #6b7280; margin: 4px 0; }
+.statusLabel { font-size: 10px; font-weight: 800; color: #6366f1; text-transform: uppercase; background: #eef2ff; padding: 2px 8px; border-radius: 12px; }
+
+.actions { width: 100%; }
+
+.acceptBtn {
+  width: 100%;
+  padding: 12px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.acceptBtn:hover { background: #4338ca; }
+
+.removeBtn {
+  width: 100%;
+  padding: 12px;
+  background: #fff;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.removeBtn:hover { background: #fef2f2; border-color: #ef4444; }
+
+.infoText { grid-column: 1/-1; text-align: center; padding: 100px; color: #9ca3af; }
+
+.followerBadge {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.countNumber { font-size: 1.2rem; font-weight: bold; }
+.countLabel { font-size: 0.7rem; text-transform: uppercase; }
+
+.tabGroup {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.tab, .activeTab {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.activeTab {
+  color: #007bff;
+  border-bottom: 3px solid #007bff;
+}
+
+.tab { color: #666; }
